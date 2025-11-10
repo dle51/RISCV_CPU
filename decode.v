@@ -47,6 +47,13 @@ always @ (*) begin
             `OPCODE_I_TYPE: begin
                 case (funct3)
                     `FUNCT3_ADDI:	alu_op = `ALU_ADDI;
+                    `FUNCT3_SLLI:   alu_op = `ALU_SLLI;
+                    `FUNCT3_SRLI: begin
+                        if (funct7 == `FUNCT7_SRLI)
+                            alu_op = `ALU_SLRI;
+                        else
+                            alu_op = `ALU_SRAI;
+                        end
                     default:		alu_op = 4'bxxxx;
                 endcase
             end
@@ -73,7 +80,17 @@ always @ (*) begin
             `OPCODE_JAL: begin
                 imm =       {{11{instruction_encoding[31]}}, instruction_encoding[31], instruction_encoding[19:12], instruction_encoding[20], instruction_encoding[30:21], 1'b0};
             end
-            `OPCODE_I_TYPE, `OPCODE_L_TYPE: begin
+            `OPCODE_I_TYPE: begin
+                case (funct3)
+                    `FUNCT3_SLLI, `FUNCT3_SRLI: begin
+                    imm =   {{27{instruction_encoding[27]}}, instruction_encoding[24:20]};
+                    end
+                endcase
+                default: begin
+                    imm =   {{20{instruction_encoding[31]}}, instruction_encoding[31:20]};
+                end
+            end
+            `OPCODE_L_TYPE: begin
                 imm =       {{20{instruction_encoding[31]}}, instruction_encoding[31:20]};
             end
             `OPCODE_LUI: begin // Cheating a bit for this instruction

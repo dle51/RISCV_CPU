@@ -34,6 +34,16 @@ always @(*) begin
         `ALU_ADDI: begin
             result = rs1 + rs2;
             end
+        `ALU_SLLI: begin
+            result = rs1 << rs2;
+            end
+        `ALU_SRLI: begin
+            result = rs1 >> rs2;
+            end
+        `ALU_SRAI: begin
+            result = rs1 >>> rs2;
+        
+        // Default Case
         default: begin
             result = 32'h00000000;
         end

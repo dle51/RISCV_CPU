@@ -45,6 +45,8 @@
 `define FUNCT7_AND      7'b0000000
 `define FUNCT7_OR       7'b0000000
 `define FUNCT7_XOR      7'b0000000
+`define FUNCT7_SRLI     7'b0000000
+`define FUNCT7_SRAI     7'b0100000
 // ------------------------------------------
 // ALU op codes
 // ------------------------------------------
@@ -54,5 +56,8 @@
 `define ALU_OR          4'b0011
 `define ALU_XOR         4'b0100
 `define ALU_ADDI        4'b1011
+`define ALU_SLLI        4'b1100
+`define ALU_SRLI        4'b1101
+`define ALU_SRAI        4'b1110
 
 `endif
