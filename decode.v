@@ -11,7 +11,7 @@ module decode (
     output reg [4:0]    rd,
     output reg [31:0]   imm,
     output reg [3:0]    alu_op,
-    output reg [6:0]    control_unit_signal,
+    output reg [7:0]    control_unit_signal,
     output reg flush_cs
 );
 
