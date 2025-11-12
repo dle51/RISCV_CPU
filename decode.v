@@ -11,8 +11,8 @@ module decode (
     output reg [4:0]    rd,
     output reg [31:0]   imm,
     output reg [3:0]    alu_op,
-    output reg          writeback,
-    output reg          mem_write_enable
+    output reg [6:0]    control_unit_signal,
+    output reg flush_cs
 );
 
 always @ (*) begin
@@ -110,24 +110,39 @@ always @ (*) begin
         endcase
 
         // ---
-        // Other Control Unit Logic
+        // Control Unit Logic
         // ---
 
-        // Memory to Register Writeback
+        // This outputs a 8-bit control signal in the format of
+        // register_write_enable, alu_src, writeback, mem_read, mem_write_enable, branch, jump, jalr
+
         case (opcode)
-            `OPCODE_R_TYPE, `OPCODE_I_TYPE, `OPCODE_LUI, `OPCODE_JAL, `OPCODE_JALR, `OPCODE_L_TYPE: begin
-                writeback = 1'b1;
+            `OPCODE_R_TYPE: begin
+                control_unit_signal =   8'b10000000;
             end
-            default: writeback = 1'b0;
+            `OPCODE_I_TYPE: begin
+                control_unit_signal =   8'b11000000;
+            end
+            `OPCODE_L_TYPE: begin
+                control_unit_signal =   8'b11110000;
+            end
+            `OPCODE_S_TYPE: begin
+                control_unit_signal =   8'b01001000;
+            end
+            `OPCODE_B_TYPE: begin
+                control_unit_signal =   8'b00000100;
+            end
+            `OPCODE_JAL: begin
+                control_unit_signal =   8'b10000010;
+            end
+            `OPCODE_JALR: begin
+                control_unit_signal =   8'b11000011;
+            end
         endcase
 
-        // Memory Write Enable
-        case (opcode)
-            `OPCODE_S_TYPE: begin
-                mem_write_enable = 1'b1;
-            end
-            default: mem_write_enable = 1'b0;
-        endcase
+        // Jump flush control signal
+
+        flush_cs = ((opcode == `OPCODE_JAL) | (opcode == `OPCODE_JALR));
 
     end
 
