@@ -12,7 +12,6 @@ module decode (
     output reg [31:0]   imm,
     output reg [3:0]    alu_op,
     output reg          writeback,
-    output reg          write_enable,
     output reg          mem_write_enable
 );
 
@@ -50,10 +49,10 @@ always @ (*) begin
                     `FUNCT3_SLLI:   alu_op = `ALU_SLLI;
                     `FUNCT3_SRLI: begin
                         if (funct7 == `FUNCT7_SRLI)
-                            alu_op = `ALU_SLRI;
+                            alu_op = `ALU_SRLI;
                         else
                             alu_op = `ALU_SRAI;
-                        end
+                    end
                     default:		alu_op = 4'bxxxx;
                 endcase
             end
@@ -85,10 +84,10 @@ always @ (*) begin
                     `FUNCT3_SLLI, `FUNCT3_SRLI: begin
                     imm =   {{27{instruction_encoding[27]}}, instruction_encoding[24:20]};
                     end
-                endcase
                 default: begin
                     imm =   {{20{instruction_encoding[31]}}, instruction_encoding[31:20]};
                 end
+                endcase
             end
             `OPCODE_L_TYPE: begin
                 imm =       {{20{instruction_encoding[31]}}, instruction_encoding[31:20]};
@@ -110,20 +109,16 @@ always @ (*) begin
             end
         endcase
 
+        // ---
+        // Other Control Unit Logic
+        // ---
+
         // Memory to Register Writeback
         case (opcode)
-            `OPCODE_LUI, `OPCODE_JALR, `OPCODE_I_TYPE, `OPCODE_R_TYPE, `OPCODE_L_TYPE: begin
+            `OPCODE_R_TYPE, `OPCODE_I_TYPE, `OPCODE_LUI, `OPCODE_JAL, `OPCODE_JALR, `OPCODE_L_TYPE: begin
                 writeback = 1'b1;
             end
             default: writeback = 1'b0;
-        endcase
-
-        // Register Write Enable
-        case (opcode)
-            `OPCODE_R_TYPE, `OPCODE_I_TYPE, `OPCODE_LUI, `OPCODE_JAL, `OPCODE_JALR, `OPCODE_L_TYPE: begin
-                write_enable = 1'b1;
-            end
-            default: write_enable = 1'b0;
         endcase
 
         // Memory Write Enable

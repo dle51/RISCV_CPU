@@ -8,7 +8,7 @@ module alu(
 );
 
 always @(*) begin
-    case(func)
+    case(alu_op)
         // R-Type Instructions
         `ALU_ADD: begin
             result = rs1 + rs2;
@@ -42,7 +42,8 @@ always @(*) begin
             end
         `ALU_SRAI: begin
             result = rs1 >>> rs2;
-        
+            end
+
         // Default Case
         default: begin
             result = 32'h00000000;
